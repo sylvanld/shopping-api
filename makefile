@@ -6,7 +6,7 @@ $(VENV):
 	virtualenv -p python3 $(VENV)
 
 requires-venv:
-	@[ -d $(VENV) ] || { echo "No virtualenv found, create it with:"; echo "\n   make install\n"; exit 1; }
+	@[ -d $(VENV) ] || make install
 
 install: $(VENV)
 	$(VENV)/bin/pip install -r requirements/lock.txt -r requirements/dev.txt
@@ -28,3 +28,8 @@ tests: requires-venv
 	rm -rf tests/output && mkdir tests/output
 	echo '<h1>Test results</h1><ul><li><a href="coverage">Coverage</a></li><li><a href="results">Results</a></li></ul>' > tests/output/index.html
 	$(VENV)/bin/python -m pytest -vvv --cov=shopping/ --cov-report=html:tests/output/coverage --cov-fail-under=90 --html=tests/output/results/index.html tests/
+
+lint: requires-venv
+	$(VENV)/bin/isort --profile black --check shopping/ tests/
+	$(VENV)/bin/black --line-length 120 --check shopping/ tests/
+	$(VENV)/bin/flake8 --max-line-length 120 shopping/ tests/
