@@ -6,6 +6,12 @@ on:
       - "*"
 
 jobs:
+  helm-tests:
+    uses: sylvanld/github-workflows/.github/workflows/helm-tests.yml@main
+    with:
+      helm_version: "v3.9.2"
+      helm_chart_path: "chart/"
+  
   python-tests:
     uses: sylvanld/github-workflows/.github/workflows/python-tests.yml@main
     with:
