@@ -16,7 +16,7 @@ help: ## Show this help
 ##@ Development targets
 
 install: $(VENV) ## Install development dependencies in a virtualenv
-	$(VENV)/bin/pip install -r requirements/lock.txt -r requirements/dev.txt
+	$(VENV)/bin/pip install -r requirements/dev.txt
 
 lock: ## Pin latest versions of dependencies compatible with requirements/prod in requirements/lock file
 	virtualenv -p python3 .tmp-venv
