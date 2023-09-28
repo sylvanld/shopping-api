@@ -1,0 +1,17 @@
+{{- if .Values.ingressRouteHostname -}}
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "chart.fullname" . }}
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+  - kind: Rule
+    match: Host(`{{ .Values.service.port }}`)
+    services:
+    - kind: Service
+      name: {{ include "chart.fullname" . }}
+      port: {{ .Values.service.port }}
+{{- end }}
