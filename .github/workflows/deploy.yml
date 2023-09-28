@@ -16,10 +16,11 @@ on:
 
 jobs:
   deploy-helm-chart:
-    uses: sylvanld/github-workflows/.github/workflows/helm-deploy.yml@main
+    uses: sylvanld/github-workflows/.github/workflows/helm-deploy.yml@v1
     with:
       helm_release_name: shopping-api
       helm_chart_values: |
+        ingressRouteHostname: "shopping.sylvan.ovh"
         image:
           repository: "sylvanld/shopping-api"
           tag: "${{ inputs.version }}"

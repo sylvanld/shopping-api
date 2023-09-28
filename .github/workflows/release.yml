@@ -35,5 +35,6 @@ jobs:
     needs: git-release
     if: inputs.deploy_on_success
     uses: ./.github/workflows/deploy.yml
+    secrets: inherit
     with:
       version: ${{ inputs.version }}
