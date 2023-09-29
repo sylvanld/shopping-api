@@ -17,24 +17,29 @@ jobs:
   tests:
     uses: ./.github/workflows/tests.yml
 
-  docker-release:
+  git-release:
     needs: tests
+    uses: sylvanld/github-workflows/.github/workflows/git-tag.yml@main
+    with:
+      git_tag: ${{ inputs.version }}
+      run_before: |
+        sed -i 's|X.Y.Z|${{ inputs.version }}|g' shopping/api/metadata.py
+        git add shopping/api/metadata.py
+
+        git config --global user.email 'action@github.com'
+        git config --global user.name 'Gitub Action'
+        git commit -m 'Release version ${{ inputs.version }}'
+
+  docker-release:
+    needs: git-release
     uses: sylvanld/github-workflows/.github/workflows/docker-release.yml@v1
     secrets: inherit
     with:
       docker_image_name: sylvanld/shopping-api
       docker_image_tags: ${{ inputs.version }}
-
-  git-release:
-    needs: docker-release
-    uses: sylvanld/github-workflows/.github/workflows/git-tag.yml@main
-    with:
-      git_tag: ${{ inputs.version }}
-      run_before: |
-        sed -i 's|X.Y.Z|${{ inputs.version }}|g' shopping/api/factory.py
   
   deploy:
-    needs: git-release
+    needs: docker-release
     if: inputs.deploy_on_success
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
