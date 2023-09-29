@@ -32,9 +32,10 @@ jobs:
 
   docker-release:
     needs: git-release
-    uses: sylvanld/github-workflows/.github/workflows/docker-release.yml@v1
+    uses: sylvanld/github-workflows/.github/workflows/docker-release.yml@main
     secrets: inherit
     with:
+      git_branch: ${{ inputs.version }}
       docker_image_name: sylvanld/shopping-api
       docker_image_tags: ${{ inputs.version }}
   
