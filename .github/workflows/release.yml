@@ -35,7 +35,7 @@ jobs:
     uses: sylvanld/github-workflows/.github/workflows/docker-release.yml@main
     secrets: inherit
     with:
-      git_branch: ${{ inputs.version }}
+      git_tag: ${{ inputs.version }}
       docker_image_name: sylvanld/shopping-api
       docker_image_tags: ${{ inputs.version }}
   
