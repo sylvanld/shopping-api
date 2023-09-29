@@ -27,9 +27,11 @@ jobs:
 
   git-release:
     needs: docker-release
-    uses: sylvanld/github-workflows/.github/workflows/git-tag.yml@v1
+    uses: sylvanld/github-workflows/.github/workflows/git-tag.yml@main
     with:
       git_tag: ${{ inputs.version }}
+      run_before: |
+        sed -i 's|X.Y.Z|${{ inputs.version }}|g' shopping/api/factory.py
   
   deploy:
     needs: git-release
