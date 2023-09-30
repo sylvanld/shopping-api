@@ -5,7 +5,7 @@ import shopping.api.v1.items
 from shopping.api.metadata import API_DESCRIPTION, API_TAGS, API_TITLE, API_VERSION
 
 
-def create_app():
+def create_api():
     api = FastAPI(
         title=API_TITLE, version=API_VERSION, description=API_DESCRIPTION, openapi_tags=API_TAGS, docs_url="/"
     )
