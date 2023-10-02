@@ -55,7 +55,11 @@ class ExtensionsManager:
         self.config = config
 
     def register(self, extension_cls: Type[Extension]):
+        print("registering extension", extension_cls)
         extension = extension_cls()
+        print("configuring extension", extension_cls)
         extension.configure(self.config)
+        print("initializing extension", extension_cls)
         extension.initialize()
+        print("registering extension addons", extension_cls)
         extension.register(self.api, self.cli)

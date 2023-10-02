@@ -1,3 +1,5 @@
+import logging
+
 from click import Group as CliGroup
 from click import group as cli_group
 from fastapi import FastAPI
@@ -6,7 +8,11 @@ from sqlalchemy.orm import DeclarativeBase, scoped_session, sessionmaker
 
 from shopping.core.extensions import Extension, ExtensionOption
 
+LOG = logging.getLogger(__name__)
+logging.basicConfig(format="%(levelname)s :: %(asctime)s :: %(message)s", level=logging.DEBUG)
 session = scoped_session(session_factory=sessionmaker())
+print("tadata")
+LOG.info("doudou")
 
 
 @cli_group("database")
@@ -35,7 +41,10 @@ class DatabaseExtension(Extension):
     ]
 
     def initialize(self):
-        self.engine = create_engine(self.config.get("database.url"))
+        database_url = self.config.get("database.url")
+        print("database url", database_url)
+        LOG.info("Initializing database engine with URL: %s", database_url)
+        self.engine = create_engine(database_url)
         session.bind = self.engine
         if self.config.get("database.auto_migrate"):
             Entity.metadata.create_all(self.engine)

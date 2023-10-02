@@ -43,3 +43,17 @@ lint: requires-venv ## Check code formatting and quality
 	$(VENV)/bin/isort --profile black --check shopping/ tests/
 	$(VENV)/bin/black --line-length 120 --check shopping/ tests/
 	$(VENV)/bin/flake8 --max-line-length 120 shopping/ tests/
+
+##@ Docker targets
+
+build:
+	@docker build -t sylvanld/shopping-api:latest .
+
+start:
+	@docker run -d --name shopping-api -p 8000:8000 sylvanld/shopping-api:latest
+
+stop:
+	@docker stop shopping-api && docker rm shopping-api
+
+shell:
+	@docker exec -it shopping-api sh

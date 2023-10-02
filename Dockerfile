@@ -15,7 +15,10 @@ ENV PATH /opt/venv/bin:$PATH
 
 COPY --from=BUILDER /opt/venv /opt/venv
 COPY shopping /app/shopping
-COPY docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
+COPY docker-entrypoint.sh /usr/bin/shopping
 
-ENTRYPOINT [ "/usr/bin/docker-entrypoint.sh" ]
+HEALTHCHECK --interval=10s --timeout=5s \
+    CMD [ "/usr/bin/shopping", "healthcheck" ]
+
+ENTRYPOINT [ "/usr/bin/shopping" ]
 CMD [ "start" ]
