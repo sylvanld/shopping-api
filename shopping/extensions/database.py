@@ -9,10 +9,7 @@ from sqlalchemy.orm import DeclarativeBase, scoped_session, sessionmaker
 from shopping.core.extensions import Extension, ExtensionOption
 
 LOG = logging.getLogger(__name__)
-logging.basicConfig(format="%(levelname)s :: %(asctime)s :: %(message)s", level=logging.DEBUG)
 session = scoped_session(session_factory=sessionmaker())
-print("tadata")
-LOG.info("doudou")
 
 
 @cli_group("database")
@@ -25,6 +22,7 @@ class Entity(DeclarativeBase):
 
 
 class DatabaseExtension(Extension):
+    name = "database"
     options = [
         ExtensionOption(
             key="database.url",
@@ -42,8 +40,6 @@ class DatabaseExtension(Extension):
 
     def initialize(self):
         database_url = self.config.get("database.url")
-        print("database url", database_url)
-        LOG.info("Initializing database engine with URL: %s", database_url)
         self.engine = create_engine(database_url)
         session.bind = self.engine
         if self.config.get("database.auto_migrate"):

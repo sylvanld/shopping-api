@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from shopping.domain.carts.dtos import CartWriteDTO
+from shopping.domain.exceptions import EntityNotFound
 from shopping.extensions.database import session
 
 from .entity import CartEntity
@@ -11,7 +12,10 @@ class CartRepository:
         self.session = session
 
     def get_by_uuid(self, uuid: str):
-        return self.session.query(CartEntity).filter_by(uuid=uuid).first()
+        cart = self.session.query(CartEntity).filter_by(uuid=uuid).first()
+        if cart is None:
+            raise EntityNotFound
+        return cart
 
     def search(self):
         query = self.session.query(CartEntity)
