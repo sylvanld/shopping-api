@@ -1,7 +1,8 @@
 VENV:=.venv
 HOST:=0.0.0.0
-PORT:=8087
 DEBUG?=true
+
+SHOPPING_API_PORT ?= 8087
 
 export
 
@@ -32,7 +33,7 @@ format: requires-venv ## Format code according to project conventions
 	$(VENV)/bin/black --line-length 120 shopping tests
 
 serve: requires-venv ## Start API server in debug mode
-	$(VENV)/bin/uvicorn --host $(HOST) --port $(PORT) shopping.__main__:api
+	$(VENV)/bin/uvicorn --host $(HOST) --port $(SHOPPING_API_PORT) shopping.__main__:api
 
 
 ##@ Validation targets

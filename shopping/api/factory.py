@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 import shopping.api.healthcheck
 import shopping.api.v1.carts
@@ -11,6 +12,13 @@ from shopping.core.config import Config
 def create_api(config: Config):
     api = FastAPI(
         title=API_TITLE, version=API_VERSION, description=API_DESCRIPTION, openapi_tags=API_TAGS, docs_url="/"
+    )
+    api.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     @api.exception_handler(Exception)
