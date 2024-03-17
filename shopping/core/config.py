@@ -50,9 +50,9 @@ class Config:
         if type is str:
             value = str(raw_value)
         elif type is bool:
-            if raw_value in ("1", "true", "True", "yes"):
+            if raw_value in ("1", "true", "True", "yes", True):
                 value = True
-            elif raw_value in ("0", "false", "False", "no"):
+            elif raw_value in ("0", "false", "False", "no", False):
                 value = False
             else:
                 raise ValueError("Unsupported format for boolean: %s=%s" % (key, raw_value))
