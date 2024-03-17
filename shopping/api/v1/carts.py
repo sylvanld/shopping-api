@@ -11,7 +11,7 @@ cart_service = CartService()
 
 
 @router.get("/groups/{groupUID}/cart", response_model=CartDTO)
-async def get_cart_endpoint(group_uid: str = Path(..., alias="groupUID")):   
+async def get_cart_endpoint(group_uid: str = Path(..., alias="groupUID")):
     return cart_service.get_cart(group_uid)
 
 

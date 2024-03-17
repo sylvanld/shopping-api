@@ -3,17 +3,19 @@ from dataclasses import dataclass
 from typing import List
 from uuid import uuid4
 
+from sqlalchemy.orm import Session
+
 from shopping.domain.carts.dtos import CartItemsBatchDTO
 from shopping.domain.carts.exceptions import BatchAlreadyExists
 from shopping.extensions.database import session
 
 from .entity import CartBatchEntity, CartItemEntity
-from sqlalchemy.orm import Session
+
 
 class Repository:
     def __init__(self, session: Session):
         self.session = session
-        
+
     def add(self, entity):
         self.session.add(entity)
 
@@ -27,32 +29,31 @@ class BatchRepository(Repository):
         if batch_uid:
             filters.append(CartBatchEntity.uid == batch_uid)
         return self.session.query(CartBatchEntity).filter(*filters)
-    
+
     def exists(self, group_uid: str, batch_uid: str):
         return self.query(group_uid, batch_uid=batch_uid).count() > 0
 
 
-def aggregate_items(items: List[CartItemEntity]) -> List[CartItemEntity]:   
+def aggregate_items(items: List[CartItemEntity]) -> List[CartItemEntity]:
     aggregated_items_index = {}
     aggregated_items = []
-        
+
     for item in items:
         aggregated_item = aggregated_items_index.get((item.item_uid, item.unit))
         if aggregated_item is None:
             aggregated_item = CartItemEntity(
-                item_uid = item.item_uid,
-                unit = item.unit,
-                quantity = item.quantity
+                item_uid=item.item_uid,
+                unit=item.unit,
             )
             aggregated_items_index[(item.item_uid, item.unit)] = aggregated_item
             aggregated_items.append(aggregated_item)
-        
+
         if item.quantity is not None:
             if aggregated_item.quantity is None:
                 aggregated_item.quantity = item.quantity
             else:
                 aggregated_item.quantity += item.quantity
-        
+
     return aggregated_items
 
 
@@ -73,7 +74,7 @@ class CartService:
     def __init__(self):
         self.batch_repository = BatchRepository(session)
         self.cart_item_repository = CartItemRepository(session)
-        
+
     def get_cart(self, group_uid: str) -> Cart:
         items = self.cart_item_repository.query(group_uid=group_uid).all()
         return Cart(items=aggregate_items(items))
@@ -88,7 +89,7 @@ class CartService:
         for item in items:
             items_by_batch[item.batch_uid].append(item)
         return [{"batch_uid": batch_uid, "items": items} for batch_uid, items in items_by_batch.items()]
-    
+
     def get_batches(self, group_uid: str):
         return self.batch_repository.query(group_uid).all()
 

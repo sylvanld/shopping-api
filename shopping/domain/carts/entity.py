@@ -1,19 +1,12 @@
 from sqlalchemy import Column, Float, Integer, String, UniqueConstraint
-from sqlalchemy.orm import relationship
 
 from shopping.extensions.database import Entity
 
 
 class CartBatchEntity(Entity):
     __tablename__ = "batch"
-    
-    __table_args__ = (
-        UniqueConstraint(
-            'uid',
-            'group_uid',
-            name='_group_batch_uc'
-        ),
-    )
+
+    __table_args__ = (UniqueConstraint("uid", "group_uid", name="_group_batch_uc"),)
 
     id = Column(Integer, primary_key=True)
     uid = Column(String(32), nullable=False)

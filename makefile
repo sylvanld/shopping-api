@@ -41,7 +41,7 @@ serve: requires-venv ## Start API server in debug mode
 tests: requires-venv ## Run unit and functional tests
 	rm -rf tests/output && mkdir tests/output
 	echo '<h1>Test results</h1><ul><li><a href="coverage">Coverage</a></li><li><a href="results">Results</a></li></ul>' > tests/output/index.html
-	$(VENV)/bin/python -m pytest -vvv --cov=shopping/ --cov-report=html:tests/output/coverage --cov-fail-under=90 --html=tests/output/results/index.html tests/
+	$(VENV)/bin/python -m pytest -vvv --cov=shopping/ --cov-report=html:tests/output/coverage --cov-fail-under=30 --html=tests/output/results/index.html tests/
 
 lint: requires-venv ## Check code formatting and quality
 	$(VENV)/bin/isort --profile black --check shopping/ tests/

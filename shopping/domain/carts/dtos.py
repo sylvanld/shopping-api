@@ -21,6 +21,7 @@ class BatchDTO(BaseModel):
     type: str
     scale: int
 
+
 class CartItemsBatchDTO(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
@@ -33,5 +34,5 @@ class CartItemsBatchDTO(BaseModel):
 
 class CartDTO(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    
+
     items: List[BatchItemDTO]
