@@ -15,7 +15,10 @@ class HealthcheckDTO(BaseModel):
 
 
 HEALTH_INFO = HealthcheckDTO(
-    title=API_TITLE, description=API_DESCRIPTION, version=API_VERSION, start_date=datetime.utcnow()
+    title=API_TITLE,
+    description=API_DESCRIPTION,
+    version=API_VERSION,
+    start_date=datetime.utcnow(),
 )
 
 router = APIRouter(tags=["api"])

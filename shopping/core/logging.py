@@ -22,7 +22,11 @@ class JSONFormatter(logging.Formatter):
                 log_data["http_version"],
                 log_data["status_code"],
             ) = record.args
-            log_data["message"] = "%s - %s %s" % (log_data["status_code"], log_data["method"], log_data["endpoint"])
+            log_data["message"] = "%s - %s %s" % (
+                log_data["status_code"],
+                log_data["method"],
+                log_data["endpoint"],
+            )
         else:
             log_data["message"] = record.getMessage()
 

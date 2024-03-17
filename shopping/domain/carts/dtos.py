@@ -1,20 +1,37 @@
-from datetime import datetime
-from typing import List
+from typing import List, Optional
 
-from pydantic import BaseModel
-
-from shopping.domain.items.dtos import ItemReadDTO
+from pydantic import BaseModel, ConfigDict, Field
 
 
-class CartWriteDTO(BaseModel):
-    label: str
+class BatchItemDTO(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    item_uid: str = Field(..., alias="itemUID")
+    quantity: Optional[float] = None
+    unit: Optional[str] = None
 
 
-class CartReadDTO(BaseModel):
-    uuid: str
-    label: str
-    creation_date: datetime
+class CartItemDTO(BatchItemDTO):
+    batch_uid: str = Field(None, alias="batchUID")
 
 
-class CartDetailsDTO(CartReadDTO):
-    items: List[ItemReadDTO]
+class BatchDTO(BaseModel):
+    uid: str
+    name: str
+    type: str
+    scale: int
+
+class CartItemsBatchDTO(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    batch_uid: str = Field(..., alias="batchUID")
+    name: str
+    type: str
+    scale: int
+    items: List[BatchItemDTO]
+
+
+class CartDTO(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+    
+    items: List[BatchItemDTO]
