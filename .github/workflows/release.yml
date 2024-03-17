@@ -18,17 +18,13 @@ jobs:
     uses: ./.github/workflows/tests.yml
 
   git-release:
-    needs: tests
     uses: sylvanld/github-workflows/.github/workflows/git-tag.yml@main
+    needs: tests
     with:
       git_tag: ${{ inputs.version }}
       run_before: |
         sed -i 's|X.Y.Z|${{ inputs.version }}|g' shopping/api/metadata.py
         git add shopping/api/metadata.py
-
-        git config --global user.email 'action@github.com'
-        git config --global user.name 'Gitub Action'
-        git commit -m 'Release version ${{ inputs.version }}'
 
   docker-release:
     needs: git-release
