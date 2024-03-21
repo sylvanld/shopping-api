@@ -29,7 +29,7 @@ lock: ## Pin latest versions of dependencies compatible with requirements/prod i
 	rm -rf .tmp-venv
 
 format: requires-venv ## Format code according to project conventions
-	$(VENV)/bin/isort shopping tests
+	$(VENV)/bin/isort -l 120 shopping tests
 	$(VENV)/bin/black --line-length 120 shopping tests
 
 serve: requires-venv ## Start API server in debug mode
@@ -44,7 +44,7 @@ tests: requires-venv ## Run unit and functional tests
 	$(VENV)/bin/python -m pytest -vvv --cov=shopping/ --cov-report=html:tests/output/coverage --cov-fail-under=30 --html=tests/output/results/index.html tests/
 
 lint: requires-venv ## Check code formatting and quality
-	$(VENV)/bin/isort --profile black --check shopping/ tests/
+	$(VENV)/bin/isort -l 120 --profile black --check shopping/ tests/
 	$(VENV)/bin/black --line-length 120 --check shopping/ tests/
 	$(VENV)/bin/flake8 --max-line-length 120 shopping/ tests/
 
