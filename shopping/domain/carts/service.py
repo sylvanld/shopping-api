@@ -5,8 +5,8 @@ from uuid import uuid4
 
 from sqlalchemy.orm import Session
 
-from shopping.domain.carts.dtos import CartItemsBatchDTO
-from shopping.domain.carts.exceptions import BatchAlreadyExists
+from shopping.domain.carts.dtos import CartBatchUpdateDTO, CartItemsBatchDTO
+from shopping.domain.carts.exceptions import BatchAlreadyExists, BatchNotFound
 from shopping.extensions.database import session
 
 from .entity import CartBatchEntity, CartItemEntity
@@ -22,8 +22,22 @@ class Repository:
     def commit(self):
         self.session.commit()
 
+    def delete(self, entity):
+        self.session.delete(entity)
+
 
 class BatchRepository(Repository):
+    def get_by_uid(self, group_uid: str, batch_uid: str):
+        """Get a batch of items by UID.
+
+        Raises:
+            BatchNotFound: If no batch exists with this UID within provided group.
+        """
+        batch = self.query(group_uid, batch_uid).first()
+        if batch is None:
+            raise BatchNotFound(f"No batch with UID {batch_uid} in group {group_uid}")
+        return batch
+
     def query(self, group_uid: str, batch_uid: str = None):
         filters = [CartBatchEntity.group_uid == group_uid]
         if batch_uid:
@@ -76,12 +90,20 @@ class CartService:
         self.cart_item_repository = CartItemRepository(session)
 
     def get_cart(self, group_uid: str) -> Cart:
-        items = self.cart_item_repository.query(group_uid=group_uid).all()
+        items = self.get_cart_items(group_uid)
         return Cart(items=aggregate_items(items))
 
     def get_cart_items(self, group_uid: str):
-        query = self.cart_item_repository.query(group_uid=group_uid)
-        return query.all()
+        items = self.cart_item_repository.query(group_uid=group_uid).all()
+        batch_by_uid = {
+            batch_uid: self.batch_repository.get_by_uid(group_uid, batch_uid)
+            for batch_uid in set(item.batch_uid for item in items)
+        }
+        for item in items:
+            if item.batch_uid and item.quantity:
+                batch = batch_by_uid[item.batch_uid]
+                item.quantity = round(item.quantity * batch.scale / batch.base_scale, 2)
+        return items
 
     def get_cart_items_by_batch(self, group_uid: str):
         items = self.get_cart_items(group_uid)
@@ -117,5 +139,42 @@ class CartService:
                 quantity=item_dto.quantity,
             )
             self.cart_item_repository.add(item)
+
+        session.commit()
+
+    def get_batch_by_uid(self, group_uid: str, batch_uid: str):
+        """Get a batch of items by UID.
+
+        Raises:
+            BatchNotFound: If no batch exists with this UID within provided group.
+        """
+        return self.batch_repository.get_by_uid(group_uid, batch_uid)
+
+    def update_cart_batch(self, group_uid: str, batch_uid: str, batch_update_dto: CartBatchUpdateDTO):
+        """Update properties of a batch of items.
+
+        Raises:
+            BatchNotFound: If no batch exists with this UID within provided group.
+        """
+        batch = self.batch_repository.get_by_uid(group_uid, batch_uid)
+
+        batch.name = batch_update_dto.name
+        batch.scale = batch_update_dto.scale
+        session.commit()
+
+        return batch
+
+    def delete_cart_batch(self, group_uid: str, batch_uid: str):
+        """Delete a batch and associated items from cart.
+
+        Raises:
+            BatchNotFound: If no batch exists with this UID within provided group.
+        """
+        items = self.cart_item_repository.query(group_uid, batch_uid)
+        for item in items:
+            self.cart_item_repository.delete(item)
+
+        batch = self.batch_repository.get_by_uid(group_uid, batch_uid)
+        self.batch_repository.delete(batch)
 
         session.commit()
