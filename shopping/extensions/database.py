@@ -5,6 +5,7 @@ from click import group as cli_group
 from fastapi import FastAPI
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, scoped_session, sessionmaker
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from shopping.core.extensions import Extension, ExtensionOption
 
@@ -19,6 +20,14 @@ def db_cli():
 
 class Entity(DeclarativeBase):
     ...
+
+
+class DatabaseMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        if session.dirty:
+            session.rollback()
+        return response
 
 
 class DatabaseExtension(Extension):
@@ -46,4 +55,5 @@ class DatabaseExtension(Extension):
             Entity.metadata.create_all(self.engine)
 
     def register(self, api: FastAPI, cli: CliGroup):
+        api.add_middleware(DatabaseMiddleware)
         cli.add_command(db_cli)

@@ -36,3 +36,8 @@ class CartDTO(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     items: List[BatchItemDTO]
+
+
+class CartBatchUpdateDTO(BaseModel):
+    name: str
+    scale: int
