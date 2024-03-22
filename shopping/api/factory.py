@@ -3,7 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 import shopping.api.healthcheck
-import shopping.api.v1.carts
+import shopping.api.v1.cart
+import shopping.api.v1.checklist
 from shopping.api.metadata import API_DESCRIPTION, API_TAGS, API_TITLE, API_VERSION
 from shopping.core.config import Config
 
@@ -36,6 +37,7 @@ def create_api(config: Config):
             )
 
     api.include_router(shopping.api.healthcheck.router)
-    api.include_router(shopping.api.v1.carts.router, prefix="/v1")
+    api.include_router(shopping.api.v1.cart.router, prefix="/v1")
+    api.include_router(shopping.api.v1.checklist.router, prefix="/v1")
 
     return api

@@ -4,7 +4,7 @@ from click import Group as CliGroup
 from click import group as cli_group
 from fastapi import FastAPI
 from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, scoped_session, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, Session, scoped_session, sessionmaker
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from shopping.core.extensions import Extension, ExtensionOption
@@ -20,6 +20,22 @@ def db_cli():
 
 class Entity(DeclarativeBase):
     ...
+
+
+class Repository:
+    session: Session
+
+    def __init__(self):
+        self.session = session
+
+    def add(self, entity):
+        self.session.add(entity)
+
+    def commit(self):
+        self.session.commit()
+
+    def delete(self, entity):
+        self.session.delete(entity)
 
 
 class DatabaseMiddleware(BaseHTTPMiddleware):
