@@ -13,6 +13,18 @@ class ChecklistBatchItemDTO(BaseDTO):
     unit: Optional[str] = None
 
 
+class CartItemAddDTO(ChecklistBatchItemDTO):
+    ...
+
+
+class CartItemReadDTO(BaseDTO):
+    item_uid: str = Field(..., alias="itemUID")
+    total_quantity: Optional[float] = Field(None, alias="totalQuantity")
+    remaining_quantity: Optional[float] = Field(None, alias="remainingQuantity")
+    unit: Optional[str] = None
+    checked: bool = False
+
+
 class ChecklistItemDTO(ChecklistBatchItemDTO):
     batch_uid: str = Field(None, alias="batchUID")
 
@@ -38,4 +50,4 @@ class ChecklistBatchUpdateDTO(BaseDTO):
 
 
 class CartDTO(BaseDTO):
-    items: List[ChecklistBatchItemDTO]
+    items: List[CartItemReadDTO]
