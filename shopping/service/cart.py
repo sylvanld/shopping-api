@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from shopping.api.v1.dtos import ChecklistBatchItemDTO
+from shopping.domain.cart_items.exceptions import CartItemNotFound
 from shopping.domain.cart_items.repository import CartItemRepository
 from shopping.domain.checklist_batches.repository import ChecklistBatchRepository
 from shopping.domain.checklist_items.repository import ChecklistItemEntity, ChecklistItemRepository
@@ -19,6 +20,7 @@ class CartItem:
     remaining_quantity: Optional[float] = None
     unit: str = None
     checked: bool = False
+    cart_item_uid: str = None
 
 
 def aggregate_items(items: List[ChecklistItemEntity]) -> List[CartItem]:
@@ -61,6 +63,7 @@ class CartService:
             item.remaining_quantity = item.total_quantity
             cart_item = cart_items.get((item.item_uid, item.unit))
             if cart_item:
+                item.cart_item_uid = cart_item.uid
                 if item.remaining_quantity and cart_item.quantity:
                     item.remaining_quantity -= cart_item.quantity
                 if item.remaining_quantity is None or item.remaining_quantity <= 0:
@@ -75,6 +78,14 @@ class CartService:
                 item.quantity = item_dto.quantity
             else:
                 item.quantity += item_dto.quantity
+        self.cart_item_repository.commit()
+        return item
+
+    def remove_cart_item(self, group_uid: str, cart_item_uid: str):
+        cart_item = self.cart_item_repository.query(group_uid=group_uid, cart_item_uid=cart_item_uid).first()
+        if cart_item is None:
+            raise CartItemNotFound(f"No cart item with UID {cart_item_uid} in group {group_uid}")
+        self.cart_item_repository.delete(cart_item)
         self.cart_item_repository.commit()
 
     def get_cart_items(self, group_uid: str):
