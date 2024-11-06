@@ -41,8 +41,7 @@ class Repository:
 class DatabaseMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         response = await call_next(request)
-        if session.dirty:
-            session.rollback()
+        session.rollback()
         return response
 
 
