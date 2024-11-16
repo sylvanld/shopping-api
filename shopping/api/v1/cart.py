@@ -14,6 +14,11 @@ async def get_cart_details(group_uid: str = Path(..., alias="groupUID")):
     return cart_service.get_cart(group_uid)
 
 
+@router.post("/groups/{groupUID}/cart/empty")
+async def empty_cart(group_uid: str = Path(..., alias="groupUID")):
+    return cart_service.empty_cart(group_uid)
+
+
 @router.post("/groups/{groupUID}/cart/items", response_model=CartItemQuantityDTO)
 async def add_item_to_cart(item_dto: CartItemAddDTO, group_uid: str = Path(..., alias="groupUID")):
     return cart_service.add_cart_item(group_uid, item_dto)

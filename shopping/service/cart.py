@@ -70,6 +70,19 @@ class CartService:
                     item.checked = True
         return Cart(items=items)
 
+    def empty_cart(self, group_uid: str):
+        # TODO: refactoring to avoid this
+        db_session = self.cart_item_repository.session
+
+        cart_items = self.cart_item_repository.query(group_uid=group_uid).all()
+        checklist_items = self.checklist_item_repository.query(group_uid=group_uid).all()
+        checklist_batches = self.checklist_batch_repository.query(group_uid=group_uid).all()
+
+        for entity in (*cart_items, *checklist_items, *checklist_batches):
+            db_session.delete(entity)
+
+        db_session.commit()
+
     def add_cart_item(self, group_uid: str, item_dto: ChecklistBatchItemDTO):
         """Add item quantity to group's cart."""
         item = self.cart_item_repository.get(group_uid, item_dto.item_uid, item_dto.unit)
