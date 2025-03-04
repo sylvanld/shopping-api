@@ -3,6 +3,7 @@ HOST:=0.0.0.0
 DEBUG?=true
 
 SHOPPING_API_PORT ?= 8087
+DATABASE_URL ?= postgresql+psycopg2://admin:password@localhost:5432/shopping
 
 export
 
@@ -50,14 +51,20 @@ lint: requires-venv ## Check code formatting and quality
 
 ##@ Docker targets
 
-build:
+build: ## Build docker image
 	@docker build -t sylvanld/shopping-api:latest .
 
-start:
+start: ## Start docker image
 	@docker run -d --name shopping-api -p 8000:8000 sylvanld/shopping-api:latest
 
-stop:
+stop: ## Stop docker image
 	@docker stop shopping-api && docker rm shopping-api
 
-shell:
-	@docker exec -it shopping-api sh
+infra-start: ## Run database and redis using docker-compose
+	docker-compose -f docker-compose/infrastructure.yml up
+
+infra-clean: ## Clean infrastructure services containers
+	docker-compose -f docker-compose/infrastructure.yml down --remove-orphans
+
+db-shell: ## Open a shell in postgresql database
+	docker exec -it postgresql psql -U admin -d shopping
